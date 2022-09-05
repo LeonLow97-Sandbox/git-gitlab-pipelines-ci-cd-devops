@@ -1,3 +1,9 @@
+# Content
+
+<a href="#gitlab commands">GitLab Commands</a>
+
+# Introduction to GitLab
+
 ### GitLab CI Basic Notes for Pipeline
 
 - `.gitlab-ci.yml` file is used to define a pipeline.
@@ -48,7 +54,14 @@ test the car:
 
 ```
 
-### GitLab Script Commands
+### Why GitLab CI?
+
+- Simple, Scalable architecture.
+- Docker first approach.
+- Pipeline as code.
+- Merge requests with CI support.
+
+<h1 id="gitlab commands">GitLab Commands</h1>
 
 |      Script Commands       |                                                                             Description                                                                             |
 | :------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------: |

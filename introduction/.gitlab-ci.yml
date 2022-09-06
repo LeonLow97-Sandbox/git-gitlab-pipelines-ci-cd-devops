@@ -1,0 +1,36 @@
+# create stages to allow running in parallel
+# specify the order in which jobs are ran.
+stages:
+    - build
+    - test
+
+# job in pipeline
+build the car:
+    stage: build
+    # to write shell commands
+    script:
+        - mkdir build
+        - cd build
+        - echo "chassis" >> car.txt
+        - echo "engine" >> car.txt
+        - echo "wheels" >> car.txt
+    # artifact repository (keep after process)
+    artifacts:
+        paths:
+            # save the entire folder
+            - build/
+
+test the car:
+    stage: test
+    script:
+        - ls
+        # `test` command is used to verify that the file car.txt was created.
+        # `-f` flag is needed to check that the specified file exists and is a regular file
+        - test -f build/car.txt
+        - cd build
+        - cat car.txt
+        # `grep` command is used for searching lines that match a regular expression.
+        # It does a global search with the regular expression and prints all matching lines.
+        - grep "chassis" car.txt
+        - grep "engine" car.txt
+        - grep "wheels" car.txt

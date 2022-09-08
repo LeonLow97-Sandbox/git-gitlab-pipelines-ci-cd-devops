@@ -4,6 +4,7 @@
     <li><a href="#gitlab commands">GitLab Commands</a></li>
     <li><a href="https://docs.gitlab.com/ee/ci/variables/predefined_variables.html">GitLab Predefined Variables</a></li>
     <li><a href="https://www.atlassian.com/agile/software-development/code-reviews">Code Reviews</a></li>
+    <li><a href="#feature">Feature Branch Workflow</a></li>
 </ul>
 
 # Introduction to GitLab
@@ -90,7 +91,7 @@ test the car:
 - Reduces integration problems.
 - Allows developers to work faster. (detects bugs, errors during the integration process.)
 
-### Continuous Delivery (CD) 
+### Continuous Delivery (CD)
 
 - Ensures that the software can be **deployed anytime to production**.
 - Commonly, the latest verison is deployed to a **testing or staging system**.
@@ -137,13 +138,14 @@ test the car:
 
 ### Predefined Environment Variables
 
-|Predefined Variables|Description|
-|:-:|:-:|
-|`CI_COMMIT_SHORT_SHA`|The first 8 characters of `CI_COMMIT_SHA`, i.e., the commit revision for which project is built.|
+| Predefined Variables  |                                           Description                                            |
+| :-------------------: | :----------------------------------------------------------------------------------------------: |
+| `CI_COMMIT_SHORT_SHA` | The first 8 characters of `CI_COMMIT_SHA`, i.e., the commit revision for which project is built. |
 
-- To replace a string inside a file like `index.js`, use the *sed* stream editor.
+- To replace a string inside a file like `index.js`, use the _sed_ stream editor.
 
-#### *sed* - stream editor
+#### _sed_ - stream editor
+
 - for filtering and transforming text
 - `sed -i 's/word1/word2/g' inputfile`
 - `-i` for edit in place (edit the same file, don't create a new one)
@@ -158,20 +160,20 @@ test the car:
 
 ### Using Caches to optimize the build speed
 
-- **Downloading dependencies** takes significant portion of the execution time. 
-- "Traditional" CI servers like Jenkins do not delete the temporary data after the execution finishes, resulting in a better execution time. 
+- **Downloading dependencies** takes significant portion of the execution time.
+- "Traditional" CI servers like Jenkins do not delete the temporary data after the execution finishes, resulting in a better execution time.
 - The `build` process takes a long time, so it's better to use the cache data.
 - Cache in GitLab Runner so the Jobs can run faster.
 - Clear GitLab cache by clicking `Clear Runner Caches`.
 
-|Common Steps needed to run a job|
-|:-:|
-|Delegate job to a GitLab Runner|
-|Download & start Docker image|
-|Clone the repository|
-|Install any required dependencies|
-|**Run the actual step**|
-|**Save the result (if needed)**|
+| Common Steps needed to run a job  |
+| :-------------------------------: |
+|  Delegate job to a GitLab Runner  |
+|   Download & start Docker image   |
+|       Clone the repository        |
+| Install any required dependencies |
+|      **Run the actual step**      |
+|  **Save the result (if needed)**  |
 
 ```
 # Make the cache globally (other jobs can use this)
@@ -208,11 +210,11 @@ except:
 
 ### Cache vs Artifacts
 
-|Cache|Artifacts|
-|:-:|:-:|
-|Caches are not used to store build results|An artifact is usually the output of a build tool.|
-|Cache should only be used as a temporary <br> storage for project dependencies.|In GitLab CI, artifacts are designed to save some <br> compiled/generated part of the build.|
-|-|Artifacts can be used to pass data between stages/jobs.|
+|                                      Cache                                      |                                          Artifacts                                           |
+| :-----------------------------------------------------------------------------: | :------------------------------------------------------------------------------------------: |
+|                   Caches are not used to store build results                    |                      An artifact is usually the output of a build tool.                      |
+| Cache should only be used as a temporary <br> storage for project dependencies. | In GitLab CI, artifacts are designed to save some <br> compiled/generated part of the build. |
+|                                        -                                        |                   Artifacts can be used to pass data between stages/jobs.                    |
 
 ### Environments in GitLab
 
@@ -231,6 +233,7 @@ variables:
 ```
 
 ### Manually deployment / Manually Triggering Jobs
+
 ```
 # Manual deployments / Manually triggering jobs
 when: manual
@@ -245,7 +248,7 @@ allow_failure: false
 - Avoids breaking the master
 - Breaking the master branch is **costly** and should be avoided.
 - Ensures that CD is always possible.
-- Each feature / task / bugfix could be done on a separate branch. 
+- Each feature / task / bugfix could be done on a separate branch.
 - Once the work is done, tested and reviewed, it can be **merged back to master**. This ensures that the master branch is always deployable.
 - Avoid branching the production or staging stream.
 - In GitLab, `REPOSITORY --> BRANCHES` (To create a branch)
@@ -267,28 +270,36 @@ deploy production:
 
 - **Merge Requests** are a good way to visualize new changes that are about to be made in the master branch.
 - Instead of making changes directly into master, the Merge Request workflow allows you to:
-    - allow others to review the changes.
-    - allows the pipeline to run once without affecting others or the master branch.
-    - allows for additional changes to be made.
-- can see the **status of the pipeline` for a specific branch.
-<img src="./pics/001.png" alt="status of the pipeline" style="display:block">
+  - allow others to review the changes.
+  - allows the pipeline to run once without affecting others or the master branch.
+  - allows for additional changes to be made.
+- can see the \*\*status of the pipeline` for a specific branch.
+  <img src="./pics/001.png" alt="status of the pipeline" style="display:block">
 - can give other developers feed back regarding a feature/fix before it gets merge into master.
-<img src="./pics/002.png" alt="feedback on feature branch">
+  <img src="./pics/002.png" alt="feedback on feature branch">
 
 ### Configuring GitLab
 
 - `SETTINGS --> REPOSITORY --> PROTECTED BRANCH`
-    - Set "Allowed to push" to "no one", so cannot push to master branch, only merge requests are allowed.
+
+  - Set "Allowed to push" to "no one", so cannot push to master branch, only merge requests are allowed.
     <img src="./pics/003.png" alt="protected branch" style="display:block">
 
 - `SETTINGS --> MERGE REQUESTS`
-    - Set `Fast-Forward merge` so merge commit are not created (cleaner look in your setup).
-    - Set `Pipelines must success` in merge checks.
+  - Set `Fast-Forward merge` so merge commit are not created (cleaner look in your setup).
+  - Set `Pipelines must success` in merge checks.
 
 ### Only job policy
 
-- [Optional] Can mark the jobs for the build & test stages with the *following only job policy*
+- [Optional] Can mark the jobs for the build & test stages with the _following only job policy_
 - This will make it **explicit** on which cases/branches will this job be executed.
+
+```
+only:
+    - master
+    - merge_requests
+```
+
 - While it is theoretically possible to **reuse** the artifact that was built inside the branch (and avoid running the build and test stages for the master branch) for the moment we will just recreate it when running the master pipeline.
 
 ### Dynamic Environments
@@ -301,21 +312,111 @@ deploy production:
 - **Changes can be reviewed by non-developers** as well (Testers, Product Owners / Project Managers, Domain Experts and so on.)
 - Dynamic environment for every merge request.
 
-### Destroying environments
+### Stop Environment
 
-- `
+- Stop environment as soon as we don't need them anymore.
+- `surge teardown address.surge.sh`
+
+<h1 id="feature">Feature Branch Workflow</h1>
+
+1. Clone Project
+
+- `git clone git@example.com:project-name.git`
+
+2. Create branch with your feature
+
+- `git checkout -b feature_name`
+
+3. Write code. Commit changes:
+
+- `git commit -am "My feature is ready"`
+
+4. Push your branch to GitLab:
+   `git push origin feature_name`
+
+5. Review your code on commits page
+6. Create a merge request
+7. Your team lead reviews the code and merges it to the main branch.
+
+### before_script vs after_script
+
+|                                `before_script`                                |                                   `after_script`                                   |
+| :---------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
+| Used to define commands/script that should run before the normal script block |   Used to define commands/scripts that should run after the normal script block.   |
+|   **before_script** can be used globally or locally within a specific job.    |        after_script can be used globally or locally within a specific job.         |
+|                                       -                                       |              The local working directory has been set back to default              |
+|                                       -                                       | Commands are executed in a separate context from before_script and script scripts. |
+
+# YAML Basics
+
+### Understanding YAML
+
+- key-value pair
+- similar to JSON
+- <a href="https://codebeautify.org/yaml-to-json-xml-csv">YAML TO JSON CONVERTER</a>
+
+### Disabling Jobs
+
+- Add a dot `.` in front of the job in the `.gitlab-ci.yml` file
+
+```
+.build website:
+```
+
+### Anchors
+
+- Anchoring properties
+- `self` takes the name John
+
+```
+person:
+  name: &name John
+  self: *name
+```
+
+- Merging the anchor to a job
+
+```
+base_person: &base
+  city: nyc
+  country: usa
+
+# parent
+person:
+  <<: *base
+  name: &name John
+  age: 29
+```
+
+### Using anchors to create job templates
+
+- Some jobs have similar template so no point copying all over again
+- Create an anchor template to solve this
+
+```
+.deploy_template: &deploy
+  only:
+    - master
+  script:
+    - npm install --global surge
+    - surge --project ./public --domain $DOMAIN
+  environment:
+    url: http://$DOMAIN
+```
+
+- Use Gitlab to validate `.gitlab-ci.yml` file
+- CI/CD --> CI Lint
 
 <h1 id="gitlab commands">GitLab Commands</h1>
 
-|      Script Commands       |                                                                             Description                                                                             |
-| :------------------------: | :-----------------------------------------------------------------------------------------------------------------------------------------------------------------: |
-|    `test -f <filename>`    |     `test` command is used to verify that the file car.txt was created. <br> `-f` flag is needed to check that the specified file exists and is a regular file.     |
-| `grep "wheels" <filename>` | `grep` command is used for searching lines that match a regular expression. <br> It does a global search with the regular expresison and prints all matching lines. |
-|      `echo "text" >>`      |                                                                          to append content                                                                          |
-|      `echo "text" >`       |                                                                         to replace content                                                                          |
-|`grep -q "jiewei" <filename>`|Quiet mode does not give any output.|
-|`echo $?`|Used after the `grep -q` code. Returns 1 if doesnt exist and 0 if exist.|
-|`- curl "http://localhost:9000" \| grep -q "Gatsby"`|**Pipes** let you use the output of a program as the input of another program. <br> The standard syntax for pipes is to list multiple commands, separated by vertical bars.|
-|`sleep 3`|Include a small number of second before the next command starts. <br>Mainly to allow server more time to start E.g., wait 3 seconds.|
-|`curl "url" \| tac \| tac \| grep -qs foo`|`tac` is a simple Unix program that reads the entire input page and <br> reverses the line order (hence we run it twice).|
-
+|                   Script Commands                    |                                                                                 Description                                                                                 |
+| :--------------------------------------------------: | :-------------------------------------------------------------------------------------------------------------------------------------------------------------------------: |
+|                 `test -f <filename>`                 |         `test` command is used to verify that the file car.txt was created. <br> `-f` flag is needed to check that the specified file exists and is a regular file.         |
+|              `grep "wheels" <filename>`              |     `grep` command is used for searching lines that match a regular expression. <br> It does a global search with the regular expresison and prints all matching lines.     |
+|                   `echo "text" >>`                   |                                                                              to append content                                                                              |
+|                   `echo "text" >`                    |                                                                             to replace content                                                                              |
+|            `grep -q "jiewei" <filename>`             |                                                                    Quiet mode does not give any output.                                                                     |
+|                      `echo $?`                       |                                                  Used after the `grep -q` code. Returns 1 if doesnt exist and 0 if exist.                                                   |
+| `- curl "http://localhost:9000" \| grep -q "Gatsby"` | **Pipes** let you use the output of a program as the input of another program. <br> The standard syntax for pipes is to list multiple commands, separated by vertical bars. |
+|                      `sleep 3`                       |                    Include a small number of second before the next command starts. <br>Mainly to allow server more time to start E.g., wait 3 seconds.                     |
+|      `curl "url" \| tac \| tac \| grep -qs foo`      |                          `tac` is a simple Unix program that reads the entire input page and <br> reverses the line order (hence we run it twice).                          |

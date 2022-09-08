@@ -1,0 +1,24 @@
+base_person: &base
+  city: nyc
+  country: usa
+
+# parent
+person:
+  <<: *base
+  name: &name John
+  age: 29
+  isMale: true
+
+  # list of items
+  stuff:
+    - laptop
+    - car
+    - bike
+  food: [pizza, donuts, cake]
+  # list of objects
+  friends:
+    - name: Jane
+      age: 19
+    - name: Mike
+      age: 22
+  self: *name

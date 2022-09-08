@@ -1,4 +1,4 @@
-# Content
+# Contents
 
 <ul>
     <li><a href="#gitlab commands">GitLab Commands</a></li>
